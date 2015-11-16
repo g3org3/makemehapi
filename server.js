@@ -18,6 +18,15 @@ server.register(Inert, err=>{
     if(err) throw err;
 })
 
+server.route({
+    method: 'GET',
+    path: '/foo/bar/baz/{name}',
+    handler: {
+        directory: {
+            path: './public'
+        }
+    }
+})
 
 server.route({
     method: 'GET',
