@@ -18,6 +18,14 @@ server.route({
     }
 });
 
+server.route({
+    method: 'GET',
+    path: '/{name}',
+    handler: (req , reply) => {
+        return reply(`Hello ${req.params.name}`)
+    }
+})
+
 server.start(err => {
     if (err) {
         throw err;
