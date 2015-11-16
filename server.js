@@ -4,9 +4,7 @@
 
 const Hapi = require('hapi');
 const server = new Hapi.Server();
-const Inert = require('inert');
-const Path = require('path')
-const Vision = require('vision');
+const H2o2 = require('h2o2');
 
 server.connection({ 
     host: 'localhost', 
@@ -14,27 +12,20 @@ server.connection({
 });
 
 
-server.register(Vision, err => {
-    if(err) throw err;
-})
-server.register(Inert, err=>{
-    if(err) throw err;
-})
-
-server.views({
-    engines: {
-        html: require('handlebars')
-    },
-    path: Path.join(__dirname, 'templates')
-})
+server.register(H2o2, err => {
+    if(err) throw err
+});
 
 server.route({
-    method: 'GET',
-    path:'/',
+    method:'GET',
+    path: '/proxy',
     handler: {
-        view: 'index.html'
+        proxy: {
+            host: '127.0.0.1',
+            port: 65535
+        }
     }
-});
+})
 
 server.start(err => {
     if (err) throw err;
