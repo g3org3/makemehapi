@@ -9,7 +9,9 @@
   "author": "George <7jagjag@gmail.com>",
   "license": "UNLICENSED",
   "dependencies": {
+    "handlebars": "^4.0.4",
     "hapi": "^11.1.1",
-    "inert": "^3.2.0"
+    "inert": "^3.2.0",
+    "vision": "^4.0.1"
   }
 }

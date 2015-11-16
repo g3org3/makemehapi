@@ -6,6 +6,7 @@ const Hapi = require('hapi');
 const server = new Hapi.Server();
 const Inert = require('inert');
 const Path = require('path')
+const Vision = require('vision');
 
 server.connection({ 
     host: 'localhost', 
@@ -13,32 +14,29 @@ server.connection({
 });
 
 
-
+server.register(Vision, err => {
+    if(err) throw err;
+})
 server.register(Inert, err=>{
     if(err) throw err;
 })
 
-server.route({
-    method: 'GET',
-    path: '/foo/bar/baz/{name}',
-    handler: {
-        directory: {
-            path: './public'
-        }
-    }
+server.views({
+    engines: {
+        html: require('handlebars')
+    },
+    path: Path.join(__dirname, 'templates')
 })
 
 server.route({
     method: 'GET',
     path:'/',
     handler: {
-        file: 'index.html'
+        view: 'index.html'
     }
 });
 
 server.start(err => {
-    if (err) {
-        throw err;
-    }
+    if (err) throw err;
     console.log('Server running at:', server.info.uri);
 });
