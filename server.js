@@ -36,18 +36,11 @@ server.route({
             mapUri: (req, cb) => {
                 console.log('doing some aditional stuff before redirecting');
                 console.log(req.query)
-                cb(null, req.query.name || "https://m.facebook.com")
+                cb(null, req.query.name || "https://github.com")
             },
             onResponse: (err, res, req, reply, settings, ttl) => {
                 console.log('receiving the response from the upstream.');
-                // console.log(settings)
-                reply(res)//.header('content-type', 'text/html')
-                .header('X-Frame-Options', 'ALLOW-FROM http://localhost:8080/')
-                // wreck.read(res, { json: true }, function (err, payload) {
- 
-                //     console.log('some payload manipulation if you want to.')
-                //     reply(payload);
-                // });
+                reply(res).header('X-Frame-Options', 'ALLOW-FROM http://localhost:8080/')
             }
         }
     }
