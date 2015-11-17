@@ -6,10 +6,7 @@
  * Dependencies
  */
 const Hapi      = require('hapi');
-const Inert     = require('inert');
-const Path      = require('path')
-const Vision    = require('vision');
-const Rot13     = require('rot13-transform');
+const Joi       = require('joi');
 
 const server = new Hapi.Server();
 
@@ -21,17 +18,16 @@ server.connection({
 
 server.route({
     method: 'GET',
-    path: '/',
+    path: '/chickens/{breed}',
+    config: {
+        validate: {
+            params: {
+                breed: Joi.string().required()
+            }
+        }
+    },
     handler: function(req, reply) {
-        var Readable = require('stream').Readable
-        var s = new Readable;
-        s.push("The Pursuit of Hapi-ness")
-        s.push(null)
-        reply(s.pipe(Rot13()))
-        /*
-        var thisfile = Fs.createReadStream(Path.join(__dirname, 'input.txt'));
-        reply(thisfile.pipe(Rot13()));
-        */
+        reply(`breed: ${req.params.breed}`)
     }
 })
 

@@ -13,6 +13,7 @@
     "handlebars": "^4.0.4",
     "hapi": "^11.1.1",
     "inert": "^3.2.0",
+    "joi": "^7.0.0",
     "rot13-transform": "^1.0.0",
     "vision": "^4.0.1"
   }
