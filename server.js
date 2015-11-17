@@ -1,3 +1,4 @@
+'use strict';
 /**
  * Makemehapi tutorial
  */
@@ -18,20 +19,36 @@ server.connection({
 
 server.route({
     method: 'POST',
-    path: '/login',
+    path: '/upload',
     config: {
-        validate: {
-            payload: Joi.object({
-                isGuest: Joi.boolean().required(),
-                username: Joi.string().when('isGuest', { is: false, then: Joi.required() }),
-                password: Joi.string().alphanum(),
-                accessToken: Joi.string().alphanum()
-            }).options({ allowUnknown: true }).without('password', 'accessToken')
+        payload: {
+            output: 'stream',
+            parse: true
         }
     },
-    handler: function(req, reply) {
-        reply(`login successful`)
-    }
+    handler: (req, reply) => {
+        console.log(Object.keys(req.payload))
+        let body = "";
+
+        if(!req.payload.file){
+            return reply("no payload")
+        }
+
+        req.payload.file.on('data', data => {
+            body += data 
+        })
+        req.payload.file.on('end', () => {
+            reply({
+                description: req.payload.description,
+                file: {
+                    data: body,
+                    filename: req.payload.file.hapi.filename,
+                    headers: req.payload.file.hapi.headers
+                }
+            })
+        })
+        
+    }  
 })
 
 server.start(err => {
