@@ -17,17 +17,20 @@ server.connection({
 
 
 server.route({
-    method: 'GET',
-    path: '/chickens/{breed}',
+    method: 'POST',
+    path: '/login',
     config: {
         validate: {
-            params: {
-                breed: Joi.string().required()
-            }
+            payload: Joi.object({
+                isGuest: Joi.boolean().required(),
+                username: Joi.string().when('isGuest', { is: false, then: Joi.required() }),
+                password: Joi.string().alphanum(),
+                accessToken: Joi.string().alphanum()
+            }).options({ allowUnknown: true }).without('password', 'accessToken')
         }
     },
     handler: function(req, reply) {
-        reply(`breed: ${req.params.breed}`)
+        reply(`login successful`)
     }
 })
 
