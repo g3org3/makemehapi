@@ -2,11 +2,16 @@
  * Makemehapi tutorial
  */
 
-const Hapi = require('hapi');
+/**
+ * Dependencies
+ */
+const Hapi      = require('hapi');
+const Inert     = require('inert');
+const Path      = require('path')
+const Vision    = require('vision');
+const Rot13     = require('rot13-transform');
+
 const server = new Hapi.Server();
-const Inert = require('inert');
-const Path = require('path')
-const Vision = require('vision');
 
 server.connection({ 
     host: 'localhost', 
@@ -14,28 +19,21 @@ server.connection({
 });
 
 
-server.register(Vision, err => {
-    if(err) throw err;
-})
-server.register(Inert, err=>{
-    if(err) throw err;
-})
-
-server.views({
-    engines: {
-        html: require('handlebars')
-    },
-    path: Path.join(__dirname, 'templates'),
-    helpersPath: 'helpers'
-})
-
 server.route({
     method: 'GET',
-    path:'/',
-    handler: {
-        view: 'index.html'
+    path: '/',
+    handler: function(req, reply) {
+        var Readable = require('stream').Readable
+        var s = new Readable;
+        s.push("The Pursuit of Hapi-ness")
+        s.push(null)
+        reply(s.pipe(Rot13()))
+        /*
+        var thisfile = Fs.createReadStream(Path.join(__dirname, 'input.txt'));
+        reply(thisfile.pipe(Rot13()));
+        */
     }
-});
+})
 
 server.start(err => {
     if (err) throw err;
