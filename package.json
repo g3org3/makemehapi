@@ -6,6 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "env": {
+  	"PYTHON": "/opt/local/bin/python2.7"
+  },
   "author": "George <7jagjag@gmail.com>",
   "license": "UNLICENSED",
   "dependencies": {
@@ -13,6 +16,7 @@
     "h2o2": "^4.0.2",
     "handlebars": "^4.0.4",
     "hapi": "^11.1.1",
+    "hapi-auth-basic": "^4.1.0",
     "inert": "^3.2.0",
     "joi": "^7.0.0",
     "rot13-transform": "^1.0.0",

@@ -8,6 +8,8 @@
  */
 const Hapi      = require('hapi')
 const Boom      = require('boom')
+const HapiAuthBasic = require('hapi-auth-basic');
+// const Bcrypt    = require('bcrypt')
 
 const server = new Hapi.Server()
 
@@ -16,43 +18,44 @@ server.connection({
    port: Number(process.argv[2] || 8080) 
 })
 
-server.state('session', {
-   path: '/',
-   ttl: 10,
-   domain: 'localhost',
-   encoding: 'base64json'
-})
-
-server.route({
-   method: 'GET',
-   path: '/set-cookie',
-   config: {
-      state: {
-         parse: true,
-         failAction: 'log'
-      }
-   },
-   handler: (req, reply) => {
-      reply('success').state('session', { key: 'makemehapi' })
+const users  = {
+   hapi: {
+      username: 'george',
+      password: 'auth',
+      name: 'George',
+      id: '123456'
    }
+}
+
+
+const validate = function(req, username, password, cb){
+   console.log(username, password)
+   const user = users[username];
+   if(!user){
+      return cb(null, false)
+   }
+
+   if(user.password == password){
+      cb(null, true, {id: user.id, name: user.name})
+   } else {
+      cb(null, false)
+   }
+   
+}
+
+server.register(HapiAuthBasic, err => {
+   server.auth.strategy('simple', 'basic', {validateFunc: validate })
 })
+
 
 server.route({
    method: 'GET',
-   path: '/check-cookie',
+   path: '/',
    config: {
-      state: {
-         parse: true,
-         failAction: 'log'
+      auth: 'simple',
+      handler: function(req, reply){
+         reply({message: "logged in!"})
       }
-   },
-   handler: (req, reply) => {
-      let session = req.state.session;
-      if(session) {
-         return reply({user: 'hapi'})
-      }
-
-      return reply(Boom.badRequest('Invalid cookie value'));
    }
 })
 
