@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 /**
  * Makemehapi tutorial
  */
@@ -6,52 +6,59 @@
 /**
  * Dependencies
  */
-const Hapi      = require('hapi');
-const Joi       = require('joi');
+const Hapi      = require('hapi')
+const Boom      = require('boom')
 
-const server = new Hapi.Server();
+const server = new Hapi.Server()
 
-server.connection({ 
-    host: 'localhost', 
-    port: Number(process.argv[2] || 8080) 
-});
+server.connection({
+   host: 'localhost', 
+   port: Number(process.argv[2] || 8080) 
+})
 
+server.state('session', {
+   path: '/',
+   ttl: 10,
+   domain: 'localhost',
+   encoding: 'base64json'
+})
 
 server.route({
-    method: 'POST',
-    path: '/upload',
-    config: {
-        payload: {
-            output: 'stream',
-            parse: true
-        }
-    },
-    handler: (req, reply) => {
-        console.log(Object.keys(req.payload))
-        let body = "";
+   method: 'GET',
+   path: '/set-cookie',
+   config: {
+      state: {
+         parse: true,
+         failAction: 'log'
+      }
+   },
+   handler: (req, reply) => {
+      reply('success').state('session', { key: 'makemehapi' })
+   }
+})
 
-        if(!req.payload.file){
-            return reply("no payload")
-        }
+server.route({
+   method: 'GET',
+   path: '/check-cookie',
+   config: {
+      state: {
+         parse: true,
+         failAction: 'log'
+      }
+   },
+   handler: (req, reply) => {
+      let session = req.state.session;
+      if(session) {
+         return reply({user: 'hapi'})
+      }
 
-        req.payload.file.on('data', data => {
-            body += data 
-        })
-        req.payload.file.on('end', () => {
-            reply({
-                description: req.payload.description,
-                file: {
-                    data: body,
-                    filename: req.payload.file.hapi.filename,
-                    headers: req.payload.file.hapi.headers
-                }
-            })
-        })
-        
-    }  
+      return reply(Boom.badRequest('Invalid cookie value'));
+   }
 })
 
 server.start(err => {
-    if (err) throw err;
-    console.log('Server running at:', server.info.uri);
-});
+   if (err) {
+      throw err
+   }
+   console.log('Server running at:', server.info.uri)
+})
